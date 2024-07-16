@@ -1,9 +1,144 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import styles from "./formAdd.module.css";
-import { TbPlus } from "react-icons/tb";
+import { TbPlus, TbX } from "react-icons/tb";
+import { v4 as uuidv4 } from "uuid";
+import { toast } from "sonner";
+import { LotionType } from "@/types/Lotion";
+import axios from "axios";
+
+interface chord {
+  id: string;
+  text: string;
+}
 
 function AddLotionForm() {
-  const handleAddChord = () => {};
+  const [onlyChords, setOnlyChords] = useState<chord[]>([]);
+  const [chordText, setChordText] = useState<string | null>(null);
+  const [imageProduct, setImageProduct] = useState<string | null>(null);
+
+  const [reqCreate, setReqCreate] = useState<LotionType | null>(null);
+
+  const handleAddChord = () => {
+    try {
+      if (chordText == null || chordText?.length == 0)
+        throw new Error("Introduce un acorde");
+      const newChord: chord = { id: uuidv4(), text: chordText as string };
+      setOnlyChords((prevChords) => [...prevChords, newChord]);
+      setReqCreate((prevReqs) => ({
+        ...(prevReqs as LotionType),
+        chords: [...onlyChords, newChord].map((chord) => chord.text),
+      }));
+      setChordText("");
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.warning(error.message);
+      }
+    }
+  };
+
+  const handleDeleteChord = (idChord: string) => {
+    setOnlyChords((prevChords) => {
+      const updatedChords = prevChords.filter((chord) => chord.id !== idChord);
+      setReqCreate((prevReqs) => ({
+        ...(prevReqs as LotionType),
+        chords: updatedChords.map((chord) => chord.text),
+      }));
+      return updatedChords;
+    });
+  };
+
+  const handleAddImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      if (e.target.files && e.target.files.length > 0) {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onloadend = async () => {
+            const base64String = reader.result as string;
+            console.log(base64String);
+            setImageProduct(base64String);
+
+            if (!reqCreate?.name)
+              throw new Error("Ingresa el nombre del producto primero");
+
+            const response = await axios
+              .post("/api/store/lotions/image", {
+                image: base64String,
+                nameLotion: reqCreate.name,
+              })
+              .catch((error) => console.log(error));
+
+            console.log(response);
+
+            if (response?.data.success) {
+              const image = response.data.data;
+
+              setReqCreate((prevReqs) => ({
+                ...(prevReqs as LotionType),
+                images: [...(prevReqs?.images || []), image],
+              }));
+
+              setImageProduct(image);
+            }
+          };
+
+          reader.readAsDataURL(file);
+        }
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      }
+    }
+  };
+
+  const handleStock = (cantity: string) => {
+    setReqCreate((prevReq) => ({
+      ...(prevReq as LotionType),
+      stock: Number(cantity),
+    }));
+  };
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    key: keyof LotionType
+  ) => {
+    const { value } = e.target;
+
+    setReqCreate((prevFormData) => ({
+      ...(prevFormData as LotionType),
+      [key]: value,
+    }));
+  };
+
+  const handleAddProduct = async () => {
+    try {
+      if (!reqCreate?.name) throw new Error("Dale un nombre al producto");
+      if (!reqCreate?.price) throw new Error("Dale un precio al producto");
+      if (!reqCreate?.genre) throw new Error("Dale un genero al producto");
+      if (!reqCreate?.brand) throw new Error("Digita la marca del producto");
+
+      const newProduct = await axios.post("/api/store/lotions/add", {
+        data: reqCreate as LotionType,
+      });
+
+      console.log(newProduct);
+
+      if (newProduct.data.success) {
+        toast.success("Producto agregado");
+        const data = newProduct.data.data;
+        console.log(data);
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      }
+    }
+  };
+
+  console.log(reqCreate);
 
   return (
     <div className={styles.barForm}>
@@ -22,6 +157,9 @@ function AddLotionForm() {
           id="first_name"
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           placeholder="John"
+          name="name"
+          value={reqCreate?.name}
+          onChange={(e) => handleInputChange(e, "name")}
           required
         />
       </div>
@@ -55,8 +193,24 @@ function AddLotionForm() {
               SVG, PNG, JPG or GIF (MAX. 800x400px)
             </p>
           </div>
-          <input id="dropzone-file" type="file" className="hidden" />
+          <input
+            id="dropzone-file"
+            type="file"
+            className="hidden"
+            onChange={handleAddImage}
+          />
         </label>
+      </div>
+
+      <div>
+        <img src={imageProduct as string} alt="imageProduct" />
+        {/* {reqCreate?.images.map((image) => (
+          <img
+            src={image}
+            alt="image"
+            style={{ width: "300px", height: "auto" }}
+          />
+        ))} */}
       </div>
 
       <div className="mb-6 mt-6">
@@ -71,6 +225,8 @@ function AddLotionForm() {
           id="first_name"
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           placeholder="200.000"
+          value={reqCreate?.price}
+          onChange={(e) => handleInputChange(e, "price")}
           required
         />
       </div>
@@ -87,6 +243,8 @@ function AddLotionForm() {
           id="stock"
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           placeholder="John"
+          value={reqCreate?.stock}
+          onChange={(e) => handleStock(e.target.value)}
           required
         />
       </div>
@@ -101,6 +259,8 @@ function AddLotionForm() {
         <select
           id="countries"
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          value={reqCreate?.genre}
+          onChange={(e) => handleInputChange(e, "genre")}
         >
           <option selected>Elige una opcion</option>
           <option value="men">Hombre</option>
@@ -121,6 +281,8 @@ function AddLotionForm() {
           id="brand"
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           placeholder="John"
+          value={reqCreate?.brand}
+          onChange={(e) => handleInputChange(e, "brand")}
           required
         />
       </div>
@@ -137,12 +299,42 @@ function AddLotionForm() {
           id="chords"
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 fle"
           placeholder="John"
+          onChange={(e) => setChordText(e.target.value as string)}
           required
+          value={chordText as string | ""}
         />
-        <div className="grid place-content-center hover:bg-gray-200 p-2 rounded-md cursor-pointer">
-          <TbPlus size={20} onClick={handleAddChord} />
+        <div
+          className="grid place-content-center hover:bg-gray-200 p-2 rounded-md cursor-pointer"
+          onClick={handleAddChord}
+        >
+          <TbPlus size={20} />
         </div>
       </div>
+
+      <div className="mb-3">
+        {onlyChords.map((chord) => (
+          <div
+            key={chord.id}
+            className="flex flex-row p-2 bg-gray-300 mt-2 rounded-md justify-between"
+          >
+            <h4 className="flex-1 grid place-content-center">{chord.text}</h4>
+            <div
+              className="grid place-content-center bg-gray-500 hover:bg-gray-600 p-2 rounded-md cursor-pointer"
+              onClick={() => handleDeleteChord(chord.id)}
+            >
+              <TbX size={20} className="text-gray-50" />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <button
+        type="button"
+        className="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 shadow-lg shadow-blue-500/50 dark:shadow-lg dark:shadow-blue-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 mt-6"
+        onClick={handleAddProduct}
+      >
+        Crear
+      </button>
     </div>
   );
 }

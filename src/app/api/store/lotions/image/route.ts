@@ -1,6 +1,5 @@
-import LotionService from "@/classes/LotionService";
-import TokenService from "@/classes/TokenService";
-import { LotionType } from "@/types/Lotion";
+// import TokenService from "@/classes/TokenService";
+import cloudinary from "@/lib/cloudinary-conf";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -23,16 +22,23 @@ export async function POST(req: Request) {
     //   throw new Error("Token no válido");
     // }
 
-    const { data }: { data: LotionType } = await req.json();
+    const { image, nameLotion } = await req.json();
 
-    const newLotion = await LotionService.addLotion(data);
+    const process_name = nameLotion.replace(/\s+/g, "_");
 
-    if (newLotion) {
-      return NextResponse.json({ success: true, data: newLotion });
-    }
+    const upImage = await cloudinary.v2.uploader.upload(image, {
+      folder: "images_lotions",
+      public_id: process_name,
+    });
+
+    console.log(upImage)
+
+    return NextResponse.json({
+      success: true,
+      data: upImage.secure_url,
+    });
   } catch (error) {
     if (error instanceof Error) {
-      return NextResponse.json({ success: false, error: error.message });
     }
   }
 }
