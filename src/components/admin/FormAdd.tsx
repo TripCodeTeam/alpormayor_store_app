@@ -8,6 +8,8 @@ import { toast } from "sonner";
 import { LotionType } from "@/types/Lotion";
 import axios from "axios";
 
+import CurrencyInput from "react-currency-input-field";
+
 interface chord {
   id: string;
   text: string;
@@ -113,7 +115,9 @@ function AddLotionForm() {
     }));
   };
 
-  const handleAddProduct = async () => {
+  const handleAddProduct = async (e: InputEvent) => {
+    e.preventDefault();
+
     try {
       if (!reqCreate?.name) throw new Error("Dale un nombre al producto");
       if (!reqCreate?.price) throw new Error("Dale un precio al producto");
@@ -141,10 +145,11 @@ function AddLotionForm() {
   console.log(reqCreate);
 
   return (
-    <div className={styles.barForm}>
+    <div className="w-11/12 ml-5">
       <h3 className="text-3xl font-bold dark:text-white mb-6 mt-6">
         Agregar nuevo producto
       </h3>
+
       <div>
         <label
           htmlFor="first_name"
@@ -202,31 +207,33 @@ function AddLotionForm() {
         </label>
       </div>
 
-      <div>
-        <img src={imageProduct as string} alt="imageProduct" />
-        {/* {reqCreate?.images.map((image) => (
-          <img
-            src={image}
-            alt="image"
-            style={{ width: "300px", height: "auto" }}
-          />
-        ))} */}
+      <div className="mt-6">
+        {reqCreate?.images?.map((image) => (
+          <img src={image} alt="image" className="w-72 h-auto" />
+        ))}
       </div>
 
       <div className="mb-6 mt-6">
         <label
-          htmlFor="first_name"
+          htmlFor="price"
           className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
         >
           Precio del producto
         </label>
-        <input
+        <CurrencyInput
           type="text"
-          id="first_name"
+          id="price"
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           placeholder="200.000"
+          defaultValue={0}
+          decimalsLimit={2}
           value={reqCreate?.price}
-          onChange={(e) => handleInputChange(e, "price")}
+          onValueChange={(value, name, values) => {
+            setReqCreate((prevReqs) => ({
+              ...(prevReqs as LotionType),
+              price: String(value),
+            }));
+          }}
           required
         />
       </div>
@@ -328,13 +335,12 @@ function AddLotionForm() {
         ))}
       </div>
 
-      <button
-        type="button"
+      <div
         className="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 shadow-lg shadow-blue-500/50 dark:shadow-lg dark:shadow-blue-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 mt-6"
-        onClick={handleAddProduct}
+        onClick={() => handleAddProduct}
       >
         Crear
-      </button>
+      </div>
     </div>
   );
 }

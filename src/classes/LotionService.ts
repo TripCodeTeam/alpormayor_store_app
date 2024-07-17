@@ -1,5 +1,5 @@
 import { prisma } from "@/prisma/db";
-import { LotionType } from "@/types/Lotion";
+import { GenreLotion, LotionType } from "@/types/Lotion";
 import { Lotion } from "@prisma/client";
 
 class LotionService {
@@ -24,6 +24,42 @@ class LotionService {
     return prisma.lotion.update({
       where: { id },
       data,
+    });
+  }
+
+  static allProducts(): Promise<Lotion[]> {
+    return prisma.lotion.findMany()
+  }
+
+  /** Method to filter lotions by chords */
+  static productsByChords(chords: string[]): Promise<Lotion[]> {
+    return prisma.lotion.findMany({
+      where: {
+        chords: {
+          hasSome: chords,
+        },
+      },
+    });
+  }
+
+  /** Method to filter lotion by genre */
+  static async productsByGenre(genre: GenreLotion): Promise<Lotion[]> {
+    return prisma.lotion.findMany({ where: { genre } });
+  }
+
+  /** Method to filter lotions by price using a budget */
+  static filterByBudget(budget: number): Promise<Lotion[]> {
+    const priceRange = 0.2 * budget; // Define a 20% range around the budget
+    const minPrice = budget - priceRange;
+    const maxPrice = budget + priceRange;
+
+    return prisma.lotion.findMany({
+      where: {
+        price: {
+          gte: minPrice.toString(),
+          lte: maxPrice.toString(),
+        },
+      },
     });
   }
 }

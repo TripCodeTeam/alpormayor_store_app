@@ -3,7 +3,7 @@ export type LotionType = {
   name: string;
   images: string[];
   price: string;
-  genre: string;
+  genre: GenreLotion;
   brand: string;
   stock: number;
   chords: string[];
@@ -13,3 +13,5 @@ export type LotionType = {
   discountEnd: Date;
   created_at: Date;
 };
+
+export type GenreLotion = "men" | "girl" | "mix"
