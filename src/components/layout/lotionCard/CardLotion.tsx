@@ -6,9 +6,10 @@ import { stringToPriceCOP } from "@/handlers/stringToCop";
 function CardLotion({ lotionData }: { lotionData: LotionType }) {
   console.log(lotionData);
   return (
-    <div className="w-full max-w-sm bg-white border border-gray-100 hover:border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 grow">
+    <div className="w-full bg-white border border-gray-100 hover:border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+
       <div className="p-3">
-        <div className="flex flex-row gap-1">
+        <div className="flex flex-row gap-2">
           <p className="pt-0.5 pb-0.5 pl-5 pr-5 grid place-content-center text-sm bg-gray-200 rounded-md">
             {lotionData.genre}
           </p>

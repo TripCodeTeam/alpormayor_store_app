@@ -2,25 +2,24 @@
 
 import React, { useEffect, useState } from "react";
 import AddLotionForm from "@/components/admin/FormAdd";
-import { TbBox, TbMinus, TbPlus } from "react-icons/tb";
+import { TbMinus, TbPlus } from "react-icons/tb";
 import { useGlobalContext } from "@/context/AuthAdmin";
 import { useRouter } from "next/navigation";
 import ListProducts from "@/components/admin/listProducts";
 
 function PanelAdmin() {
-  const { user, loading, startLoading, stopLoading } = useGlobalContext();
+  const { user, loading } = useGlobalContext();
   const router = useRouter();
 
   const [openAddProduct, setOpenAddProduct] = useState<boolean>(false);
 
-  // useEffect(() => {
-  //   startLoading();
-  //   if (!user) {
-  //     router.push("/");
-  //   } else {
-  //     stopLoading();
-  //   }
-  // }, [user, router, startLoading, stopLoading]);
+  console.log(user);
+
+  useEffect(() => {
+    if (!loading && user === null) {
+      router.push("/");
+    }
+  }, [user, loading]);
 
   if (loading) {
     return <p>Loading...</p>; // Puedes personalizar este cargador según tus necesidades
@@ -49,12 +48,11 @@ function PanelAdmin() {
           {openAddProduct && "Cancelar agregacion"}
           {!openAddProduct && "Agregar nuevo produto"}
         </button>
-
       </div>
 
       {openAddProduct && <AddLotionForm />}
 
-      <ListProducts  />
+      <ListProducts />
     </>
   );
 }

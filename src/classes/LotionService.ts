@@ -27,8 +27,8 @@ class LotionService {
     });
   }
 
-  static allProducts(): Promise<Lotion[]> {
-    return prisma.lotion.findMany()
+  static allProducts(skip: number, take: number): Promise<Lotion[]> {
+    return prisma.lotion.findMany({ skip, take });
   }
 
   /** Method to filter lotions by chords */

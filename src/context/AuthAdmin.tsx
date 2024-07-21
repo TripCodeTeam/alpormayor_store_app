@@ -16,21 +16,20 @@ interface GlobalContextType {
   loading: boolean;
   setUserData: (userData: AdminEditAuth) => void;
   handleLogout: () => void;
-  startLoading: () => void;
-  stopLoading: () => void;
 }
 
 const GlobalContext = createContext<GlobalContextType | undefined>(undefined);
 
 export function GlobalProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AdminEditAuth | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const infoSession = Cookies.get("userData");
     if (infoSession) {
       setUser(JSON.parse(infoSession));
     }
+    setLoading(false);
   }, []);
 
   const setUserData = (userData: AdminEditAuth) => {
@@ -43,9 +42,6 @@ export function GlobalProvider({ children }: { children: ReactNode }) {
     Cookies.remove("userData");
   };
 
-  const startLoading = () => setLoading(true);
-  const stopLoading = () => setLoading(false);
-
   return (
     <GlobalContext.Provider
       value={{
@@ -53,8 +49,6 @@ export function GlobalProvider({ children }: { children: ReactNode }) {
         loading,
         setUserData,
         handleLogout,
-        startLoading,
-        stopLoading,
       }}
     >
       {children}

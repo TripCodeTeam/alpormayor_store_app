@@ -2,6 +2,7 @@ import React from "react";
 
 function CarrouselLotions({ images }: { images: string[] }) {
   console.log(images)
+
   return (
     <div
       id="default-carousel"

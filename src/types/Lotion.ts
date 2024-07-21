@@ -14,4 +14,4 @@ export type LotionType = {
   created_at: Date;
 };
 
-export type GenreLotion = "men" | "girl" | "mix"
+export type GenreLotion = "men" | "girl" | "mix" | "all"
