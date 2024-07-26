@@ -107,6 +107,7 @@ function AddLotionForm() {
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
     key: keyof LotionType
   ) => {
+    e.preventDefault();
     const { value } = e.target;
 
     setReqCreate((prevFormData) => ({
@@ -115,9 +116,7 @@ function AddLotionForm() {
     }));
   };
 
-  const handleAddProduct = async (e: InputEvent) => {
-    e.preventDefault();
-
+  const handleAddProduct = async () => {
     try {
       if (!reqCreate?.name) throw new Error("Dale un nombre al producto");
       if (!reqCreate?.price) throw new Error("Dale un precio al producto");
@@ -163,7 +162,7 @@ function AddLotionForm() {
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           placeholder="John"
           name="name"
-          value={reqCreate?.name}
+          value={reqCreate?.name || ""}
           onChange={(e) => handleInputChange(e, "name")}
           required
         />
@@ -172,7 +171,7 @@ function AddLotionForm() {
       <div className="flex items-center justify-center w-full mt-6">
         <label
           htmlFor="dropzone-file"
-          className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+          className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50  dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
         >
           <div className="flex flex-col items-center justify-center pt-5 pb-6">
             <svg
@@ -184,9 +183,9 @@ function AddLotionForm() {
             >
               <path
                 stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
                 d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
               />
             </svg>
@@ -208,8 +207,8 @@ function AddLotionForm() {
       </div>
 
       <div className="mt-6">
-        {reqCreate?.images?.map((image) => (
-          <img src={image} alt="image" className="w-72 h-auto" />
+        {reqCreate?.images?.map((image, index) => (
+          <img src={image} alt="image" key={index} className="w-72 h-auto" />
         ))}
       </div>
 
@@ -227,7 +226,7 @@ function AddLotionForm() {
           placeholder="200.000"
           defaultValue={0}
           decimalsLimit={2}
-          value={reqCreate?.price}
+          value={reqCreate?.price || ""}
           onValueChange={(value, name, values) => {
             setReqCreate((prevReqs) => ({
               ...(prevReqs as LotionType),
@@ -250,7 +249,7 @@ function AddLotionForm() {
           id="stock"
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           placeholder="John"
-          value={reqCreate?.stock}
+          value={reqCreate?.stock || ""}
           onChange={(e) => handleStock(e.target.value)}
           required
         />
@@ -266,10 +265,10 @@ function AddLotionForm() {
         <select
           id="countries"
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-          value={reqCreate?.genre}
+          value={reqCreate?.genre || ""}
           onChange={(e) => handleInputChange(e, "genre")}
         >
-          <option selected>Elige una opcion</option>
+          <option value="">Elige una opcion</option>
           <option value="men">Hombre</option>
           <option value="girl">Mujer</option>
           <option value="mix">Mixto</option>
@@ -288,7 +287,7 @@ function AddLotionForm() {
           id="brand"
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           placeholder="John"
-          value={reqCreate?.brand}
+          value={reqCreate?.brand || ""}
           onChange={(e) => handleInputChange(e, "brand")}
           required
         />
@@ -300,6 +299,7 @@ function AddLotionForm() {
       >
         Acordes principales
       </label>
+
       <div className="flex flex-row gap-5">
         <input
           type="text"
@@ -337,7 +337,7 @@ function AddLotionForm() {
 
       <div
         className="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 shadow-lg shadow-blue-500/50 dark:shadow-lg dark:shadow-blue-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 mt-6"
-        onClick={() => handleAddProduct}
+        onClick={handleAddProduct}
       >
         Crear
       </div>

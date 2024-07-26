@@ -5,6 +5,7 @@ import { stringToPriceCOP } from "@/handlers/stringToCop";
 
 function CardLotion({ lotionData }: { lotionData: LotionType }) {
   console.log(lotionData);
+
   return (
     <div className="w-full bg-white border border-gray-100 hover:border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
 
