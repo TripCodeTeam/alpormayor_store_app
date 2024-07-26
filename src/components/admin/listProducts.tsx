@@ -32,8 +32,8 @@ function ListProducts() {
   return (
     <>
       <div className="w-11/12 ml-5 flex flex-wrap grow gap-6 mt-14">
-        {allProducts?.map((product) => (
-          <CardLotion lotionData={product} />
+        {allProducts?.map((product, index) => (
+          <CardLotion key={index} lotionData={product} />
         ))}
       </div>
     </>

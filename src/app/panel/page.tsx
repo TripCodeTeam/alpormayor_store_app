@@ -19,7 +19,7 @@ function PanelAdmin() {
     if (!loading && user === null) {
       router.push("/");
     }
-  }, [user, loading]);
+  }, [user, loading, router]);
 
   if (loading) {
     return <p>Loading...</p>; // Puedes personalizar este cargador según tus necesidades
