@@ -13,7 +13,7 @@ function PanelAdmin() {
 
   const [openAddProduct, setOpenAddProduct] = useState<boolean>(false);
 
-  console.log(user);
+  // console.log(user);
 
   useEffect(() => {
     if (!loading && user === null) {
